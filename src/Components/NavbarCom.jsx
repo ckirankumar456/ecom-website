@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { SelectProduct } from "./SelectSlice";
 import { iPhones } from "../iphones";
 import { OnePluses } from "../OnePlus";
 import { Gents } from "../imagedata";
@@ -12,14 +14,11 @@ import { Shoueses } from "../shousedata";
 import { LadiesSarees } from "../ladiesSarees";
 import { PantsData } from "../pantsdata";
 
-import { SelectProduct } from "./SelectSlice";
-import { useDispatch, useSelector } from "react-redux";
-
 function NavbarCom() {
-  useEffect(() => {
-    <h1>Flipkart</h1>;
-  });
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const SelectedAddToCart = useSelector((state) => state.addtocart.addSelected);
+  const wishlist = useSelector((state) => state.wishlist.items);
   const products = {
     oneplusData: { product: OnePluses, name: "Oneplus" },
     iphoneData: { product: iPhones, name: "iPhones" },
@@ -34,89 +33,82 @@ function NavbarCom() {
     sareesData: { product: LadiesSarees, name: "Sarees" },
     pantsData: { product: PantsData, name: "Pants" },
   };
-
-  const dispatch = useDispatch();
-  const [selectedProduct, setSelectedProduct] = useState("");
-
   const handleSelectChange = (e) => {
-    const changeTheOption = e.target.value;
-    setSelectedProduct(changeTheOption);
-
+    const value = e.target.value;
+    if (!value) return;
     const selectedProducts = Object.values(products).find(
-      (product) => product.name === changeTheOption
+      (p) => p.name === value
     );
-
-    if (selectedProducts) {
-      dispatch(SelectProduct(selectedProducts));
-    }
+    if (!selectedProducts) return;
+    dispatch(SelectProduct(selectedProducts));
+    navigate("/productdisplay");
   };
-  const SelectedAddToCart = useSelector((state) => state.addtocart.addSelected);
-  const wishlist = useSelector((state) => state.wishlist.items);
 
   return (
-    <>
-      <nav>
-        <div className="nav_container">
-          <div className="logo">
-            <h1>Flipkart</h1>
-            <h2>Explore Plus</h2>
-          </div>
-          <div className="location">
-            <p>Delivery To Anywhere</p>
-            <h3>
-              <i class="fa-solid fa-location-dot"></i>
-              Update location
-            </h3>
-          </div>
-          <div className="search">
-            <select onChange={handleSelectChange}>
-              <option value="" id="opt">
-                -- Select a Product -- 🔍{" "}
+    <nav>
+      <div className="nav_container">
+        <div className="logo">
+          <h1>Flipkart</h1>
+          <h2>Explore Plus</h2>
+        </div>
+        <div className="location">
+          <p>Delivery To Anywhere</p>
+          <h3>
+            <i className="fa-solid fa-location-dot"></i>
+            Update location
+          </h3>
+        </div>
+        <div className="search">
+          <select defaultValue="" onChange={handleSelectChange}>
+            <option value="" id="opt">
+              -- Select a Product --
+            </option>
+            {Object.values(products).map((product) => (
+              <option key={product.name} value={product.name}>
+                {product.name}
               </option>
-              {Object.values(products).map((product, index) => (
-                <option key={product.id} value={product.name}>
-                  {product.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="dropdown">
-            <h3>
-              <i class="fa-solid fa-circle-user"></i>
-              &nbsp; Kiran
-            </h3>
-            <div className="dropdown_content">
-              <li>
-                <i className="fa-solid fa-circle-user"></i> MY Profile
-              </li>
-
-              <li>
-                <i className="fa-solid fa-box"></i> Order
-              </li>
-              <li>
-                <i className="fa-solid fa-ticket-simple"></i> Coupons
-              </li>
-              <li>
-                <i className="fa-solid fa-heart"></i> Wishlist {wishlist.length}
-              </li>
-              <li>
-                <i className="fa-solid fa-bell"></i> Notification
-              </li>
-              <li>
-                <i className="fa-solid fa-power-off"></i> Logout
-              </li>
-            </div>
-          </div>
-          <h3>Bcome a seller</h3>
-          <div className="cart">
-            <h3>
-              <i class="fa-solid fa-cart-shopping"></i>
-              Cart {SelectedAddToCart.length}
-            </h3>
+            ))}
+          </select>
+        </div>
+        <div className="dropdown">
+          <h3>
+            <i className="fa-solid fa-circle-user"></i>
+            &nbsp; Kiran
+          </h3>
+          <div className="dropdown_content">
+            <li>
+              <i className="fa-solid fa-circle-user"></i> MY Profile
+            </li>
+            <li>
+              <i className="fa-solid fa-box"></i> Order
+            </li>
+            <li>
+              <i className="fa-solid fa-ticket-simple"></i> Coupons
+            </li>
+            <li>
+              <i className="fa-solid fa-heart"></i> Wishlist {wishlist.length}
+            </li>
+            <li>
+              <i className="fa-solid fa-bell"></i> Notification
+            </li>
+            <li>
+              <i className="fa-solid fa-power-off"></i> Logout
+            </li>
           </div>
         </div>
-      </nav>
-    </>
+        <h3>Bcome a seller</h3>
+        <div
+          className="cart"
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate("/cart")}
+        >
+          <h3>
+            <i className="fa-solid fa-cart-shopping"></i>
+            Cart {SelectedAddToCart.length}
+          </h3>
+        </div>
+      </div>
+    </nav>
   );
 }
 
